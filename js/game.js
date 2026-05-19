@@ -1,4 +1,5 @@
 (function () {
+  console.log('game.js v2 - bombs independent');
   var firebaseConfig = {
     apiKey: "AIzaSyAII5NbG7hFd0lItCsOwnoVdYWXzc5ztyE",
     authDomain: "evdeki-restoranim-1.firebaseapp.com",
@@ -12,8 +13,9 @@
   if (typeof firebase !== 'undefined' && !firebase.apps.length) {
     firebase.initializeApp(firebaseConfig);
   }
-  var auth = typeof firebase !== 'undefined' ? firebase.auth() : null;
-  var db = typeof firebase !== 'undefined' ? firebase.firestore() : null;
+  var auth = typeof firebase !== 'undefined' && firebase.auth ? firebase.auth() : null;
+  var db = typeof firebase !== 'undefined' && firebase.firestore ? firebase.firestore() : null;
+  console.log('game.js init auth:', !!auth, 'db:', !!db);
 
   var gameArea = document.getElementById('game-area');
   var player = document.getElementById('player');
@@ -38,7 +40,10 @@
 
   var boostTimer = 0;
 
-  var ITEM_TYPES = ['strawberry', 'cheese', 'bomb', 'brownie', 'cookies'];
+  var ITEM_TYPES = ['strawberry', 'cheese', 'brownie', 'cookies'];
+  var bombs = [];
+  var bombSpawnCounter = 0;
+  var MAX_BOMBS = 5;
   var ITEM_IMGS = {
     strawberry: 'çilek.png',
     cheese: 'peynir.png',
@@ -59,31 +64,45 @@
   window.addEventListener('resize', resizeGame);
   resizeGame();
 
+  function getLocalHighScore() {
+    return parseInt(localStorage.getItem('mutfakPanikHighScore') || '0', 10);
+  }
+
   if (auth) {
     auth.onAuthStateChanged(function (user) {
+      console.log('game.js onAuthStateChanged user:', user ? user.uid : null);
       currentUser = user;
-      if (user) {
+      if (user && db) {
         loadHighScore(user);
+      } else if (user && !db) {
+        console.warn('game.js Firestore not available, using localStorage');
+        highScore = getLocalHighScore();
+        updateHighScoreUI();
       } else {
-        highScore = parseInt(localStorage.getItem('mutfakPanikHighScore') || '0', 10);
+        highScore = getLocalHighScore();
         updateHighScoreUI();
       }
     });
   } else {
-    highScore = parseInt(localStorage.getItem('mutfakPanikHighScore') || '0', 10);
+    highScore = getLocalHighScore();
     updateHighScoreUI();
   }
 
   function loadHighScore(user) {
+    if (!db) { highScore = getLocalHighScore(); updateHighScoreUI(); return; }
     db.collection('users').doc(user.uid).get()
       .then(function (doc) {
+        console.log('game.js loadHighScore doc.exists:', doc.exists, 'data:', doc.data());
         if (doc.exists && typeof doc.data().highScore === 'number') {
           highScore = doc.data().highScore;
+        } else {
+          highScore = getLocalHighScore();
         }
         updateHighScoreUI();
       })
-      .catch(function () {
-        highScore = parseInt(localStorage.getItem('mutfakPanikHighScore') || '0', 10);
+      .catch(function (err) {
+        console.error('game.js loadHighScore error:', err);
+        highScore = getLocalHighScore();
         updateHighScoreUI();
       });
   }
@@ -94,7 +113,7 @@
   }
 
   function saveHighScore(newScore) {
-    var prevLocal = parseInt(localStorage.getItem('mutfakPanikHighScore') || '0', 10);
+    var prevLocal = getLocalHighScore();
     if (newScore > prevLocal) {
       localStorage.setItem('mutfakPanikHighScore', newScore);
     }
@@ -102,21 +121,11 @@
     updateHighScoreUI();
 
     if (currentUser && db) {
-      db.collection('users').doc(currentUser.uid).get()
-        .then(function (doc) {
-          if (doc.exists) {
-            return db.collection('users').doc(currentUser.uid).update({ highScore: newScore });
-          } else {
-            return db.collection('users').doc(currentUser.uid).set({
-              email: currentUser.email || '',
-              name: currentUser.displayName || '',
-              highScore: newScore
-            });
-          }
-        })
-        .catch(function (e) {
-          console.error('Firestore skor kaydedilemedi:', e);
-        });
+      db.collection('users').doc(currentUser.uid).set({ highScore: newScore }, { merge: true })
+        .then(function () { console.log('game.js score saved to Firestore:', newScore); })
+        .catch(function (e) { console.error('game.js Firestore score save failed:', e); });
+    } else {
+      console.warn('game.js cannot save to Firestore, currentUser:', !!currentUser, 'db:', !!db);
     }
   }
 
@@ -146,6 +155,7 @@
     tryAddItem() {
       if (Math.random() < 0.4) {
         var key = ITEM_TYPES[Math.floor(Math.random() * ITEM_TYPES.length)];
+        if (key === 'bomb') key = 'strawberry';
         this.itemType = key;
         this.itemVis = document.createElement('div');
         this.itemVis.className = 'item';
@@ -163,6 +173,34 @@
       this.itemType = null;
       this.hasItem = false;
     }
+  }
+
+  function spawnBomb() {
+    if (bombs.length >= MAX_BOMBS) return;
+    var b, tries = 0;
+    do {
+      b = {
+        x: 20 + Math.random() * (areaWidth - 60),
+        y: 20 + Math.random() * (areaHeight * 0.85),
+        el: null
+      };
+      tries++;
+    } while (tries < 30 && platforms.some(function (p) {
+      return b.x + 28 > p.x && b.x < p.x + p.w && Math.abs(p.y - b.y) < 60;
+    }));
+    b.el = document.createElement('div');
+    b.el.className = 'item';
+    b.el.style.backgroundImage = 'url(./css/assets/' + ITEM_IMGS.bomb + ')';
+    b.el.style.left = b.x + 'px';
+    b.el.style.top = (areaHeight - b.y) + 'px';
+    gameArea.appendChild(b.el);
+    bombs.push(b);
+  }
+
+  function removeBomb(b) {
+    var idx = bombs.indexOf(b);
+    if (idx > -1) bombs.splice(idx, 1);
+    if (b.el && b.el.parentNode) b.el.parentNode.removeChild(b.el);
   }
 
   function initPlatforms() {
@@ -206,6 +244,16 @@
           scoreElement.textContent = score;
         }
       });
+      for (var bi = bombs.length - 1; bi >= 0; bi--) {
+        bombs[bi].y -= diff;
+        if (bombs[bi].y < -50) removeBomb(bombs[bi]);
+      }
+    }
+
+    bombSpawnCounter++;
+    if (bombSpawnCounter >= 60 && bombs.length < MAX_BOMBS) {
+      bombSpawnCounter = 0;
+      if (Math.random() < 0.3) spawnBomb();
     }
 
     if (velocityY > 0 && boostTimer === 0) {
@@ -218,16 +266,24 @@
         ) {
           velocityY = jumpStrength;
           if (p.hasItem) {
-            if (p.itemType === 'bomb') {
-              velocityY = 15;
-              p.removeItem();
-            } else {
-              boostTimer = 40;
-              p.removeItem();
-            }
+            boostTimer = 40;
+            p.removeItem();
           }
         }
       });
+    }
+
+    for (var j = bombs.length - 1; j >= 0; j--) {
+      var b = bombs[j];
+      if (
+        playerX + (playerWidth - 10) > b.x &&
+        playerX + 10 < b.x + 28 &&
+        playerY > b.y - 10 &&
+        playerY < b.y + 28 + 10
+      ) {
+        velocityY = 15;
+        removeBomb(b);
+      }
     }
 
     if (playerY < -50) {
@@ -236,6 +292,10 @@
 
     player.style.transform = 'translate(' + playerX + 'px, ' + (areaHeight - playerY - playerWidth) + 'px)';
     platforms.forEach(function (p) { p.render(); });
+    bombs.forEach(function (b) {
+      b.el.style.left = b.x + 'px';
+      b.el.style.top = (areaHeight - b.y) + 'px';
+    });
     animationId = requestAnimationFrame(update);
   }
 
@@ -268,9 +328,12 @@
     if (score > highScore) {
       saveHighScore(score);
     } else {
+      var local = getLocalHighScore();
+      if (score > local) localStorage.setItem('mutfakPanikHighScore', score);
       updateHighScoreUI();
     }
     platforms.forEach(function (p) { p.removeItem(); });
+    for (var k = bombs.length - 1; k >= 0; k--) removeBomb(bombs[k]);
   }
 
   window.resetGame = function resetGame() {
