@@ -1,66 +1,63 @@
 # 🍽️ Evdeki Restoranım
 
-Türk mutfağının en sevilen tariflerini, sporcu ve bebek öğünlerini kapsayan, modern ve kullanıcı dostu bir yemek tarifi web uygulaması.
+A modern, user-friendly recipe web application featuring traditional Turkish cuisine, athlete nutrition, and baby meal recipes. Built with a focus on simplicity, performance, and a clean UI experience.
 
-## Özellikler
+---
 
-- **200+ Tarif** — Gündelik, pratik, sporcu beslenmesi ve bebek öğünleri kategorilerinde geniş tarif arşivi
-- **Kategori Sayfaları** — Her kategoriye özel alt sayfalar (yiyecek, içecek, tatlı)
-- **Fotoğraflı Kartlar** — Her tarif kendi özgün fotoğrafıyla görüntülenir
-- **Canlı Arama** — Tarif adına, alt kategoriye veya malzemeye göre anlık filtreleme
-- **Malzeme ile Ara** — Sahip olduğun malzemelerle yapabileceğin tarifleri bul
-- **Adım Adım Tarif** — Modal içinde fotoğraflı, adım adım tarif anlatımı
-- **Kullanıcı Girişi** — Firebase Authentication ile e-posta/kayıt ve Google ile giriş
-- **Mini Oyun** — "Mutfakta Panik" arcade oyunu (en yüksek puan kaydı)
-- **Tamamen Mobil Uyumlu** — Responsive tasarım, sidebar navigasyon
-- **file:// Uyumlu** — Herhangi bir sunucu gerektirmeden yerel dosya sistemi üzerinden çalışır
+## 🚀 Features
 
-## Kategoriler
+- 🥘 **200+ Recipes** — Everyday meals, quick dishes, athlete-friendly nutrition, and baby food options  
+- 📂 **Category System** — Dedicated pages for food, drinks, and desserts  
+- 🖼️ **Recipe Cards** — Each recipe displayed with a clean card layout  
+- 🔎 **Live Search** — Instantly filter recipes by name or ingredients  
+- 🧂 **Ingredient-Based Search** — Find recipes based on what you already have  
+- 📖 **Step-by-Step Mode** — Detailed cooking instructions in modal view  
+- 🔐 **User Authentication** — Firebase email/password & Google login  
+- 🎮 **Mini Game** — “Kitchen Panic” arcade game with score tracking  
+- 📱 **Fully Responsive** — Optimized for mobile and desktop  
+- 💻 **No Server Required** — Runs directly via local files (file:// compatible)
 
-| Kategori | Yiyecek | İçecek | Tatlı |
-|----------|---------|--------|-------|
-| 🏠 Gündelik | ✅ | ✅ | ✅ |
-| ⚡ Pratik Tarifler | ✅ | ✅ | ✅ |
-| 💪 Sporcu Beslenmesi | ✅ | ✅ | ✅ (Fit) |
-| 👶 Bebek Öğünleri | ✅ | — | ✅ |
+---
 
-## Kullanılan Teknolojiler
+## 📁 Categories
 
-- HTML5, CSS3, Vanilla JavaScript (ES5/ES6+)
-- Firebase Authentication (Google & e-posta ile giriş)
-- Firebase Firestore (kullanıcı verileri ve oyun skorları)
-- JSON tabanlı tarif veritabanı
-- Google Fonts (Marcellus, Poppins)
-- Boxicons
+- 🏠 Everyday Meals  
+- ⚡ Quick Recipes  
+- 💪 Athlete Nutrition  
+- 👶 Baby Meals  
+- 🍰 Desserts  
+- 🥤 Drinks  
 
-## Proje Yapısı
+---
 
-```
-├── index.html              
-├── Yemekler5.json          
-├── girisKayit.html         
-├── malzeme-ara.html        
-├── game.html               
-├── js/
-│   ├── script.js           
-│   ├── recipe-cards.js     
-│   ├── category-recipes.js 
-│   ├── girisKayit.js       
-│   ├── firebase.js         
-│   ├── game.js             
-│   └── malzeme-ara.js      
-├── css/
-│   ├── style.css           
-│   ├── girisKayit.css      
-│   ├── game.css            
-│   └── assets/tarifler/    
-├── yemekler/               
-├── içecekler/              
-└── tatlılar/               
-```
+## 🛠️ Technologies Used
 
-## Geliştiriciler
+- HTML5  
+- CSS3  
+- Vanilla JavaScript (ES6+)  
+- Firebase Authentication  
+- Firebase Firestore  
+- JSON-based data structure  
+- Google Fonts (Poppins, Marcellus)  
+- Boxicons  
 
-- **[SumTix](https://github.com/SumTix)**
-- **[lightlymoon](https://github.com/lightlymoon)**
+---
 
+## 👨‍💻 Developers
+
+- [SumTix](https://github.com/SumTix)  
+- [lightlymoon](https://github.com/lightlymoon)  
+
+---
+
+## ⭐ Project Goal
+
+This project aims to combine traditional cooking culture with modern web technologies, creating an interactive and educational recipe platform.
+
+---
+
+## 📌 Notes
+
+- Designed for educational and portfolio purposes  
+- Easily extendable with new recipes and features  
+- Firebase integration optional but recommended for full functionality  
