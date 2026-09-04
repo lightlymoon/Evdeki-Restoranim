@@ -1,5 +1,5 @@
 const firebaseConfig = {
-    apiKey: "AIzaSyAII5NbG7hFd0lItCsOwnoVdYWXzc5ztyE",
+    apiKey: "",
     authDomain: "evdeki-restoranim-1.firebaseapp.com",
     projectId: "evdeki-restoranim-1",
     storageBucket: "evdeki-restoranim-1.firebasestorage.app",
