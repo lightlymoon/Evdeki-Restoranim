@@ -1,11 +1,11 @@
 (function () {
   console.log('game.js v2 - bombs independent');
   var firebaseConfig = {
-    apiKey: "AIzaSyAII5NbG7hFd0lItCsOwnoVdYWXzc5ztyE",
+    apiKey: "",
     authDomain: "evdeki-restoranim-1.firebaseapp.com",
     projectId: "evdeki-restoranim-1",
     storageBucket: "evdeki-restoranim-1.firebasestorage.app",
-    messagingSenderId: "238625102318",
+    messagingSenderId: "",
     appId: "1:238625102318:web:449783527cdb6fcc8656ff",
     measurementId: "G-EK97FS901E"
   };
