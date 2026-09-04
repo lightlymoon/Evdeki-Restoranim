@@ -6,8 +6,8 @@
     projectId: "evdeki-restoranim-1",
     storageBucket: "evdeki-restoranim-1.firebasestorage.app",
     messagingSenderId: "",
-    appId: "1:238625102318:web:449783527cdb6fcc8656ff",
-    measurementId: "G-EK97FS901E"
+    appId: "",
+    measurementId: ""
   };
 
   if (typeof firebase !== 'undefined' && !firebase.apps.length) {
